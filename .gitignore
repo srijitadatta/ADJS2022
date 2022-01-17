@@ -1,3 +1,9 @@
+# Annoying DS Store files
+.DS_Store
+data/.DS_Store
+assignments/.DS_Store
+scripts/.DS_Store
+
 # History files
 .Rhistory
 .Rapp.history
