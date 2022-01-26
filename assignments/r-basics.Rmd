@@ -1,0 +1,67 @@
+---
+title: "R Basics"
+output: html_notebook
+---
+
+This is a chance to practice writing some of the code we've covered so far. 
+You can reference our "R Dictionary" here:
+[https://github.com/eklucas/ADJS2022/blob/main/tipsheets/R-dictionary.md](https://github.com/eklucas/ADJS2022/blob/main/tipsheets/R-dictionary.md)
+
+
+Create a *character vector* that lists your five favorite foods (or movies, TV shows, books, albums, whatever) and then print that vector. 
+Remember that you have to give it a name.
+```{r}
+
+```
+
+Create a *numeric vector* with every whole number between 10 and 20. 
+```{r}
+
+```
+
+Pull out the seventh item in that vector.
+```{r}
+
+```
+
+Create a data frame with two columns: one for the first names of everyone in this class and one for the last names.
+```{r}
+
+```
+
+Pull out the column of last names.
+```{r}
+
+```
+
+Pull out the second item in the last names column.
+```{r}
+
+```
+
+Import the tidyverse package
+```{r}
+
+```
+
+Import the MLB 2021 salaries data file
+```{r}
+
+```
+
+Show which players play 1B (first base)
+```{r}
+
+```
+
+Calculate their average salary
+```{r}
+
+```
+
+Calculate the average salary per position; where do first basemen rank?
+```{r}
+
+```
+
+
