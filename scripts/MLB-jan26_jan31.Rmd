@@ -1,0 +1,105 @@
+---
+title: "MLB: Jan 26 and 31"
+output: html_notebook
+---
+
+Importing packages: for any package you've installed that isn't part of base R (such as tidyverse), use the library() function to bring those packages into your script so you can use them. 
+```{r}
+library(tidyverse)
+library(janitor)
+```
+
+Importing data: R can import most any filetype you're likely to come across, sometimes with the help of an additional package. Most of the time, though, we'll be importing CSVs using the read_csv() function. 
+
+Check out the documentation. It's important to start getting comfortable with reading documentation for different functions:
+```{r}
+?read_csv
+```
+
+Import the MLB salaries file, and use janitor's clean_names() function to make all the variable names lowercase and with no spaces (janitor replaces spaces with _)
+```{r}
+
+MLB <- read_csv("data/MLB_2021.csv") %>% clean_names()
+
+```
+
+Get to know the data a bit and practice tidyverse functions: 
+select() : choose columns to look at in our results
+filter() : filters rows based on criteria
+arrange() : sorts your results
+group_by() : group rows 
+summarise() : do math or calculations on your data as a whole or on groups
+
+```{r}
+MLB %>% select(player_name, team_name)
+```
+
+Look at only the players who are on the Kansas City Royals team
+```{r}
+MLB %>% 
+  select(player_name, team_name) %>% 
+  filter(team_name=="Kansas City Royals")
+```
+
+Calculate the total salary for the team using sum() and the average player's salary using mean(). Both of these functions, and any other summarizing functions, work within the summarise() function:
+```{r}
+MLB %>% 
+  filter(team_name=="Kansas City Royals") %>%
+  summarise(total = sum(salary), average = mean(salary))
+```
+
+Add on the arrange function to sort the results. If you want them sorted by the average salary, with the largest number on top, sort descending by using the desc function within the arrange function:
+```{r}
+MLB %>% 
+  filter(team_name=="Kansas City Royals") %>%
+  summarise(total = sum(salary), average = mean(salary)) %>%
+  arrange(desc(average))
+```
+
+Using the filter allows us to calculate the average salary for a single team. But if you want to calculate the average salary for every team to easily compare, use group_by(). This will group all your rows into groups based on whatever you put in the group_by() function: 
+```{r}
+MLB %>% 
+  group_by(team_name) %>%
+  summarise(total = sum(salary), average = mean(salary)) %>% 
+  arrange(desc(average))
+```
+
+The summary() function is not a part of tidyverse, but is good to know when you want to quickly evaluate a numeric variable such as salary. Here we pull salary out of the MLB data table and feed it into the summary() function: 
+```{r}
+summary(MLB$salary)
+```
+
+The n() function automatically does a count of rows. Using it here will give us the number of players in each team: 
+```{r}
+MLB %>% 
+  group_by(team_name) %>%
+  summarise(players = n())
+```
+
+The count function is a shortcut function that does what grou_by() and summarise() do together. It always uses n() as the summary function, and is a great way to evaluate what values are in a variable and how many times each value appears in your data: 
+```{r}
+MLB %>% count(league)
+```
+
+You can tack on the arrange() function to see which values appear the most. The count() function will always name the summary count "n", so you can use that in your arrange function: 
+```{r}
+MLB %>% count(position) %>%
+  arrange(desc(n))
+```
+
+If we want to only look at players who play for teams in the American League, there are several ways to filter for those players. We must use the variable "league", and capture the three sub leagues that are in the AL: East, Central, and West. When stringing together different criteria, use | for OR and & for AND:
+```{r}
+MLB %>%
+  filter(league=="AL-East" | league=="AL-Central" | league=="AL-West")
+```
+
+There are several ways to use filter here. Here are some other options that all return the same results. We'll go over these other options in more detail later: 
+```{r}
+MLB %>%
+  filter(league %in% c("AL-East","AL-Central","AL-West"))
+
+MLB %>% filter(substr(league,1,2)=="AL")
+
+MLB %>% filter(grepl("AL", league))
+```
+
