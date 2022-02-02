@@ -11,6 +11,9 @@ scripts/.DS_Store
 # Session Data files
 .RData
 
+# Big data files
+data/dispatch.csv
+
 # User-specific files
 .Ruserdata
 
