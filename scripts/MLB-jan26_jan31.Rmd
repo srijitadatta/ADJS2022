@@ -1,6 +1,7 @@
 ---
 title: "MLB: Jan 26 and 31"
-output: html_notebook
+output:
+html_notebook: default
 ---
 
 Importing packages: for any package you've installed that isn't part of base R (such as tidyverse), use the library() function to bring those packages into your script so you can use them. 

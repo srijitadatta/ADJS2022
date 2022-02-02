@@ -1,6 +1,7 @@
 ---
 title: "R Basics"
-output: html_notebook
+output:
+html_notebook: default
 ---
 
 This is a chance to practice writing some of the code we've covered so far. 

@@ -1,6 +1,7 @@
 ---
 title: "Dispatch"
-output: html_notebook
+output:
+html_notebook: default
 ---
 
 For this practice, you'll be working with the dispatch data from the Columbia Police.
