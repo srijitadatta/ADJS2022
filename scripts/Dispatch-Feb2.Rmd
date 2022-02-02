@@ -1,0 +1,57 @@
+---
+title: "Dispatch"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(lubridate)
+```
+
+Load the data downloaded from https://www.como.gov/CMS/911dispatch/police.php?type=&keyword=&Start_Date=2021-01-01&End_Date=2022-01-01&Submit=Filter
+85,569 rows
+```{r}
+dispatch <- read_csv("data/dispatch.csv")
+```
+
+Integrity Checks: use the count() function on all of the columns in our data, so we can get a sense of what the data looks like and what we might need to clean or mutate.
+```{r}
+dispatch %>% count(InNum)
+# look to see which InNum values are duplicated:
+dispatch %>% count(InNum) %>%
+  filter(n>1) 
+# inspect the records with duplicate InNums to see what's up (different values in ExtNatureDisplayName):
+dispatch %>% filter(InNum=="2021044284")
+```
+
+Use the range() function to evaluate the CallDateTime field: what's the first and last date? 
+But because the CallDateTime is stored as a character, it's not showing the real first and last dates. We'll convert it to a date-time field later.
+```{r}
+dispatch %>% count(CallDateTime)
+dispatch %>% summarise(date_range = range(CallDateTime))
+```
+
+Explore ExtNatureDisplayName and Report. ExtNatureDisplayName is relatively clean, although you can see a couple of misspellings for "BURGLARY". Also note that some categories seem vague: "CHECK AREA", "CHECK BUILDING", "CHECK SUBJECT"... we should ask the PD what distinguishes these categories.
+```{r}
+dispatch %>% count(ExtNatureDisplayName)# %>% arrange(desc(n))
+```
+
+The Report field, which tells us whether the incident resulted in a police report, has a lot of NA values in it: these are NULLs, and need to be treated differently than other values. We filter for NAs using a function: is.na(). The results tell us that over 75,000 (the majority) of incidents don't result in a police report:
+```{r}
+dispatch %>% filter(is.na(Report))
+```
+
+Now, using a new package called "lubridate", we'll transform the CallDateTime field using two new functions: 
+mutate() is a function that creates a new column in our data, with a value for each row. 
+mdy_hms() is a lubridate function that converts a character column, or string, that is formatted as "month day year hour minute second" into a date-time column.
+Once we check that the mutate function works and creates a new column (tacked onto the end), overwrite the original dataset with this new addition:
+```{r}
+dispatch <- dispatch %>% mutate(new_CDT = mdy_hms(CallDateTime))
+```
+
+Finally, you can save your cleaned / transformed data into a new CSV, using the write_csv() function:
+```{r}
+write_csv(dispatch, "data/my_dispatch.csv")
+```
+
