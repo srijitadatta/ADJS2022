@@ -1,0 +1,72 @@
+---
+title: "Dispatch"
+output: html_notebook
+---
+
+For this practice, you'll be working with the dispatch data from the Columbia Police.
+
+The goal of this practice is to give you more experience using various functions in different combinations in order to answer questions of a dataset. 
+
+Load the tidyverse and lubridate libraries
+```{r}
+
+```
+
+# Load the dispatch data
+If you saved a new csv at the end of class on Wed, Feb 2, use that csv (with the new column called "new_CDT"). If you didn't get that far, load the original csv file and run the mutate code below to add that column in, because you'll need it for the following questions
+```{r}
+dispatch <- 
+```
+
+Mutate code, if necessary: 
+```{r}
+dispatch <- dispatch %>% mutate(new_CDT = mdy_hms(CallDateTime))
+```
+
+# Answer these questions: 
+- What is the true date range of this data? 
+  Hint: use the new_CDT column and the range() function 
+```{r}
+
+```
+
+- Which day of the week had the most incidents? 
+```{r}
+
+```
+
+- Which month had the most incidents?
+  Hint: lubridate has a month() function that extracts the month from a date
+```{r}
+))
+```
+
+- Which Police Area responded to the most "911 CHECKS"?
+```{r}
+
+```
+
+- Here is some code that looks for any police dispatches to my street and then looks at the most common incident type (ExtNatureDisplayName): 
+```{r}
+dispatch %>% filter(grepl("RIPLEY", Address))
+
+dispatch %>% filter(grepl("RIPLEY", Address)) %>%
+  count(ExtNatureDisplayName) %>%
+  arrange(desc(n))
+```
+
+-Using similar code, look for incidents near where you live. What's the most common incident type?
+```{r}
+
+```
+
+- How often do incidents where shots are fired result in the creation of a police report?
+```{r}
+
+```
+
+- What hour are police most active on the weekends? 
+```{r}
+
+```
+
