@@ -39,7 +39,7 @@ dispatch <- dispatch %>% mutate(new_CDT = mdy_hms(CallDateTime))
 - Which month had the most incidents?
   Hint: lubridate has a month() function that extracts the month from a date
 ```{r}
-))
+
 ```
 
 - Which Police Area responded to the most "911 CHECKS"?
