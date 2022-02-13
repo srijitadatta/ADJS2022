@@ -1,0 +1,91 @@
+---
+title: "UCD Deaths: Feb 7 - 14"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+```
+
+###Download and import the data
+We downloaded "Underlying Cause of Death" data by state, year and cause for 2018-2020 (the most recent year available) from [CDC Wonder](wonder.cdc.gov).
+
+```{r}
+deaths <- read_tsv("data/ucd-deaths-by-state-year-cause.txt")
+```
+
+###Things to deal with: 
+Suppressed numbers in deaths, population
+Deaths and population are character columns
+Random hashtags in Cause List? (these are "rankable deaths" according to the Notes)
+Remove notes from the bottom
+Clean column names
+
+
+Clean names:
+```{r}
+deaths <- deaths %>% clean_names()
+```
+
+Separate out the notes, but save them because they have valuable information:
+```{r}
+notes <- deaths %>% filter(!is.na(notes)) %>% select(notes)
+deaths <- deaths %>% filter(is.na(notes))
+```
+
+Add new columns for deaths and population that are converted to numbers (NAs will be introduced where the original values are "Suppressed"):
+```{r}
+deaths <- deaths %>% mutate(num_deaths = as.numeric(deaths))
+deaths <- deaths %>% mutate(num_pop = as.numeric(population))
+```
+
+Save both the notes and the cleaned up deaths data:
+```{r}
+write_csv(notes, "data/ucd-notes.csv")
+write_csv(deaths, "data/ucd-clean.csv")
+```
+
+###Questions we asked in class: 
+How many people die in the US every year? 
+What caused the most deaths in Missouri? 
+Which state reported the most deaths? 
+How many people died from firearms? Drugs? Suicide? 
+What is the most common cause of death for each year? 
+How do Missouri common causes of death compare to national causes?
+Compare common causes of death by state? 
+Which causes of death is increasing from year to year? 
+Compare infections diseases in Missouri to other states.
+
+1. How many people die in the US every year? 
+```{r}
+deaths %>% 
+  group_by(year) %>% 
+  summarise(total_deaths = sum(num_deaths, na.rm=T))
+```
+2. What caused the most deaths in Missouri? 
+```{r}
+deaths %>% filter(state=="Missouri") %>% 
+  group_by(icd_10_113_cause_list) %>%
+  summarise(total_deaths = sum(num_deaths, na.rm=T)) %>%
+  arrange(desc(total_deaths))
+```
+
+3. What cause the most deaths in Missouri in 2020? 
+```{r}
+deaths %>% filter(state=="Missouri" & year==2020) %>%
+  select(icd_10_113_cause_list, num_deaths) %>%
+  arrange(desc(num_deaths))
+```
+
+4. Which state reported the most deaths? 
+```{r}
+deaths %>%
+  filter(year==2020) %>%
+  group_by(state, num_pop) %>%
+  summarise(total_deaths = sum(num_deaths, na.rm=T)) %>%
+  arrange(desc(total_deaths)) %>%
+  mutate(pct = total_deaths / num_pop*100) %>%
+  arrange(desc(pct))
+```
+
