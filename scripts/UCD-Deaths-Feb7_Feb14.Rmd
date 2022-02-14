@@ -74,19 +74,59 @@ deaths %>% filter(state=="Missouri") %>%
 
 3. What cause the most deaths in Missouri in 2020? 
 ```{r}
-deaths %>% filter(state=="Missouri" & year==2020) %>%
+MO2020 <- deaths %>% filter(state=="Missouri" & year==2020) %>%
   select(icd_10_113_cause_list, num_deaths) %>%
   arrange(desc(num_deaths))
 ```
 
 4. Which state reported the most deaths? 
 ```{r}
+deaths %>% 
+  group_by(state) %>% 
+  summarise(total_deaths = sum(num_deaths, na.rm=T)) %>%
+  arrange(desc(total_deaths))
+```
+Which state had the highest death rate? 
+```{r}
 deaths %>%
   filter(year==2020) %>%
   group_by(state, num_pop) %>%
   summarise(total_deaths = sum(num_deaths, na.rm=T)) %>%
-  arrange(desc(total_deaths)) %>%
-  mutate(pct = total_deaths / num_pop*100) %>%
-  arrange(desc(pct))
+  mutate(rate = total_deaths/num_pop*100000) %>%
+  arrange(desc(rate))
 ```
 
+How many people died from firearms? Drugs? Suicide? 
+
+```{r}
+deaths %>% count(icd_10_113_cause_list)
+
+deaths %>% filter(grepl("firearm", icd_10_113_cause_list, ignore.case=TRUE)) %>% count(icd_10_113_cause_list)
+
+deaths %>% filter(grepl("firearm", icd_10_113_cause_list, ignore.case=TRUE)) %>%
+  summarise(total_deaths = sum(num_deaths, na.rm=T))
+
+deaths %>% filter(grepl("firearm", icd_10_113_cause_list, ignore.case=TRUE)) %>%
+  group_by(year) %>%
+  summarise(total_deaths = sum(num_deaths, na.rm=T)) 
+
+```
+```{r}
+deaths %>% 
+  count(icd_10_113_cause_list) %>% 
+  filter(grepl("substance|drug|firearm", icd_10_113_cause_list, ignore.case=TRUE))
+```
+
+
+What is the most common cause of death for each year? 
+How do Missouri common causes of death compare to national causes?
+Compare common causes of death by state? 
+Which causes of death is increasing from year to year? 
+```{r}
+deaths %>%
+  group_by(icd_10_113_cause_list, year) %>%
+  summarise(total_deaths = sum(num_deaths, na.rm=T))
+```
+
+
+Compare infections diseases in Missouri to other states.
