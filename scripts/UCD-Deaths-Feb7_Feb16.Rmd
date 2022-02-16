@@ -1,5 +1,5 @@
 ---
-title: "UCD Deaths: Feb 7 - 14"
+title: "UCD Deaths: Feb 7 - 16"
 output: 
 html_notebook: default
 ---
@@ -121,12 +121,29 @@ deaths %>%
 What is the most common cause of death for each year? 
 How do Missouri common causes of death compare to national causes?
 Compare common causes of death by state? 
-Which causes of death is increasing from year to year? 
+
+Which causes of death are increasing from year to year? 
 ```{r}
-deaths %>%
+chg_in_cause <- deaths %>%
   group_by(icd_10_113_cause_list, year) %>%
-  summarise(total_deaths = sum(num_deaths, na.rm=T))
+  summarise(total_deaths = sum(num_deaths, na.rm=T)) %>%
+  pivot_wider(names_from=year, values_from=total_deaths) %>%
+  mutate(pct_chg = round((`2020`-`2018`)/`2018`, digits=4)) %>%
+  arrange(desc(pct_chg))
 ```
 
-
 Compare infections diseases in Missouri to other states.
+
+Create a population table
+```{r}
+pop <- deaths %>% distinct(state, year, num_pop) %>% filter(!is.na(num_pop))
+```
+
+Which state had the highest death rate in 2020?
+```{r}
+deaths %>% 
+  group_by(state, year) %>%
+  summarise(totals_deaths = sum(num_deaths, na.rm=T)) %>%
+  inner_join(pop, by=c("state","year"))
+```
+

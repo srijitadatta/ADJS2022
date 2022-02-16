@@ -1,0 +1,86 @@
+---
+title: "Baltimore City Employees' Salaries"
+output: 
+html_notebook: default
+---
+
+1. Load the necessary package(s)
+```{r}
+
+```
+
+2. Load the data into a variable called "employees"
+```{r}
+
+```
+
+
+## INTEGRITY CHECKS
+
+Is any individual in here twice? Can you figure out why?
+```{r}
+
+
+```
+
+How many years of data do we have?
+```{r}
+
+```
+
+What are the min and max annual salary given out in 2020? 
+```{r}
+
+```
+
+Which jobs get paid $0?
+```{r}
+
+```
+
+How clean are the job titles? Are there a lot of duplicates? 
+```{r}
+
+
+```
+
+Clean up the JobTitles by making everything lowercase
+(hint: use the mutate() function to overwrite the current JobTitle field, using the function str_to_lower())
+```{r}
+
+```
+
+Take a look at agency names; how clean are they? 
+```{r}
+
+```
+
+## QUESTIONS OF THE DATA
+
+Who's the highest paid employee in FY2020?
+```{r}
+
+```
+
+
+Which agency has the highest average salary in 2020? 
+```{r}
+
+```
+
+How many people work in the police department in 2020? 
+```{r}
+
+```
+
+How many are "police officers"?
+```{r}
+
+
+```
+
+What is the police officers' total salary? Average salary?
+```{r}
+
+
+```
