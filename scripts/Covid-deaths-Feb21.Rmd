@@ -1,6 +1,7 @@
 ---
 title: "Covid Deaths - Feb 21"
-output: html_notebook
+output: 
+html_notebook: default
 ---
 
 ```{r}
