@@ -1,0 +1,100 @@
+---
+title: "Covid Deaths - Feb 21-23"
+output: 
+html_notebook: default
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+```
+
+Covid death data comes from [the CDC](https://data.cdc.gov/NCHS/Provisional-COVID-19-Deaths-by-Race-and-Hispanic-O/ks3g-spdg)
+
+```{r}
+covid_deaths <- read_csv("data/Provisional_COVID-19_Deaths_by_Race_and_Hispanic_Origin__and_Age.csv")
+```
+
+Population data comes from the Census Bureau, and is processed to match the CDC Covid data's demographic groups (see create-pop-by-race-eth-age.R)
+```{r}
+pop <- read_csv("data/pop-by-race-eth-age.csv")
+```
+
+clean names in the covid deaths file
+```{r}
+covid_deaths <- covid_deaths %>% clean_names()
+```
+
+*note overlapping age groups, "United States" in the state column*
+*but no aggregate totals in the race and ethnicity column except for one:*
+```{r}
+# Does the race/ethnicity have a total by state? 
+covid_deaths %>% count(race_and_hispanic_origin_group)
+
+# Does the population data have a "United States" row? NO
+pop %>% count(name)
+```
+
+join the two tables on the three columns that they share: state, age, and race/ethnicity
+```{r}
+covid_join <- covid_deaths %>% inner_join(pop, by=c("state"="name","age_group","race_and_hispanic_origin_group"="race_eth")) %>%
+  select(-state.y)
+```
+
+You can use anti_join() to put leftover covid deaths rows in a new variable
+```{r}
+covid_leftovers <- covid_deaths %>% anti_join(covid_join, by=c("state", "age_group", "race_and_hispanic_origin_group"))
+```
+
+What percentage of total deaths are in our join table?
+```{r}
+covid_join %>% summarise(total_covid = sum(covid_19_deaths, na.rm=T))
+```
+```{r}
+covid_deaths %>% filter(race_and_hispanic_origin_group=="Total Deaths") %>%
+  select(covid_19_deaths)
+```
+```{r}
+873996/915094
+```
+
+For which demographic groups are covid deaths most often suppressed? 
+```{r}
+covid_join %>% 
+  filter(is.na(covid_19_deaths)) %>% 
+  group_by(age_group, race_and_hispanic_origin_group) %>%
+  summarise(n = n()) %>%
+  arrange(desc(n))
+  
+```
+If trying to figure out exactly what the column "n" refers to in the above results, you can inspect the records that make up one of the groups. For example, let's look closer at the "0-17 years" age group and "Non-Hispanic White" race/ethnicity, for which the above results say there are 36 rows: 
+```{r}
+covid_join %>% filter(age_group=="0-17 years" & race_and_hispanic_origin_group=="Non-Hispanic White" & is.na(covid_19_deaths))
+```
+We can see that each of these rows represents a state. So there are 36 states for which there are no recorded deaths of Non-Hispanic Whites who are 0-17 years old.
+
+
+Which race/ethnicity group was the hardest hit by covid?
+To best answer this question and fairly compare different groups, calculate rates (you can do this inside the summarise() function): 
+```{r}
+covid_join %>% 
+  group_by(race_and_hispanic_origin_group) %>%
+  summarise(total_covid = sum(covid_19_deaths, na.rm=T), 
+            total_pop = sum(pop2019),
+            rate = sum(covid_19_deaths, na.rm=T)/sum(pop2019)*100000) %>%
+  arrange(desc(rate))
+```
+These results are skewed because the Non-White Hispanic population is much older than other groups. If you ran these results by an epidemiologist, they would suggest that you should age-adjust the results. Age adjustment is not overly complicated, but rather than do that here we can compare race/ethnicity groups within different age groups 
+
+Use the above code to look at individual age groups by filtering for each age group:
+```{r}
+covid_join %>% 
+  filter(age_group=="18-29 years") %>%
+  group_by(race_and_hispanic_origin_group) %>%
+  summarise(total_covid = sum(covid_19_deaths, na.rm=T), 
+            total_pop = sum(pop2019),
+            rate = sum(covid_19_deaths, na.rm=T)/sum(pop2019)*100000) %>%
+  arrange(desc(rate))
+```
+
+This analysis will make the disparity analysis more clear.
