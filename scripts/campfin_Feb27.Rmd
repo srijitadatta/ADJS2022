@@ -1,0 +1,50 @@
+---
+title: "Campaign Finance - Feb 28"
+output: 
+html_notebook: default
+---
+#Introduction: 
+Each candidate for federal office (U.S. House of Representatives, U.S. Senate, President) must register with the Federal Election Commission (FEC) and form a Political Action Committee (PAC) to receive contributions. Candidates can have several different kinds of PACs, but everyone has a "principal campaign committee" through which they receive money.
+
+It's an election year: every Representative is up for re-election in an even year, since Reps serve 2-year terms. One third of the Senate is up for re-election every two years because Sens serve 6-year terms. Candidates can receive money even if they're not running for re-election, but individuals are limited in how much they can give a candidate each 2-year cycle: $2900.
+
+Missouri has 8 House seats and 2 Senate seats; only 1 Senate seat is up for re-election in 2022; Roy Blunt is not running for re-election so it's an open seat. Josh Hawley won't be up for re-election until 2024.
+
+```{r}
+library(tidyverse)
+```
+
+Load the three tables: contributions, candidates, committees
+```{r}
+contributions <- read_csv("data/campfin/mo_contributions.csv")
+candidates <- read_csv("data/campfin/candidates.csv")
+committees <- read_csv("data/campfin/committees.csv")
+```
+
+#Documentation for these three tables: 
+
+**Individual contributions**:
+https://www.fec.gov/campaign-finance-data/contributions-individuals-file-description/
+**Candidates**: 
+https://www.fec.gov/campaign-finance-data/candidate-master-file-description/
+**Committees**: 
+https://www.fec.gov/campaign-finance-data/committee-master-file-description/
+
+
+# INTEGRITY CHECKS
+Contributions data: 
+```{r}
+contributions %>% 
+  count(cmte_id) %>%
+  inner_join(committees, by="cmte_id") %>%
+  arrange(desc(n))
+```
+
+```{r}
+contributions %>% group_by(transaction_tp) %>%
+  summarise(total = sum(transaction_amt)) %>%
+  arrange(desc(total))
+```
+
+
+# QUESTIONS OF THE DATA
