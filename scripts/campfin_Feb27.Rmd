@@ -48,3 +48,31 @@ contributions %>% group_by(transaction_tp) %>%
 
 
 # QUESTIONS OF THE DATA
+
+Professors from MU who donated: 
+```{r}
+contributions %>% filter((grepl("UNIV.*MISSOURI", employer) | 
+                           grepl("UNIV.*MO", employer)) & 
+                           employer!="UNIV OF CENTRAL MO") %>%
+  summarise(total = sum(transaction_amt))
+```
+
+```{r}
+candidates %>% filter(election_yr=="2022") %>%
+  count(party) %>%
+  arrange(desc(n))
+```
+
+```{r}
+candidates %>% 
+  filter(election_yr=="2022" & office_st=="MO" & office=="S") %>%
+  inner_join(contributions, by=c("pcc"="cmte_id")) %>%
+  group_by(party) %>%
+  summarise(total = sum(transaction_amt)) %>%
+  arrange(desc(total))
+```
+
+```{r}
+contributions %>% count(occupation) %>% filter(grepl("CEO", occupation))
+```
+
