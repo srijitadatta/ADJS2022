@@ -1,0 +1,37 @@
+---
+title: "NYC Crashes"
+output:
+html_notebook: default
+
+---
+```{r}
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(RSocrata)   # you'll need to run install.packages("RSocrata") first
+```
+
+
+We'll be directly downloading some data from the NYC Open Data Portal
+Here's the page: [https://data.cityofnewyork.us/Public-Safety/Motor-Vehicle-Collisions-Crashes/h9gi-nx95](https://data.cityofnewyork.us/Public-Safety/Motor-Vehicle-Collisions-Crashes/h9gi-nx95)
+* each row is a single crash event
+* there are blanks in the "borough" column
+
+Here's how to get the data:
+* Click API
+* Change the API Endpoint from JSON to CSV
+* Copy
+
+In order to make things a little easier on ourselves, we're going to narrow our request (the main file is quite large). If you read the API docs and try some things you can find ways to do this.
+
+
+
+```{r}
+data <- read.socrata("https://data.cityofnewyork.us/resource/h9gi-nx95.csv?borough=MANHATTAN")
+```
+
+Notes about the data: 
+* 292,126 rows (out of 1.83 million) - 16%
+* there are some blanks in the on_street_name, off_street_name, cross_street_name
+
+Now, some questions!
