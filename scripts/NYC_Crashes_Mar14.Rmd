@@ -28,10 +28,46 @@ In order to make things a little easier on ourselves, we're going to narrow our 
 
 ```{r}
 data <- read.socrata("https://data.cityofnewyork.us/resource/h9gi-nx95.csv?borough=MANHATTAN")
+
+# data <- read_csv("https://data.cityofnewyork.us/resource/h9gi-nx95.csv")
 ```
 
 Notes about the data: 
-* 292,126 rows (out of 1.83 million) - 16%
+* 296,027 rows (out of 1.87 million)
 * there are some blanks in the on_street_name, off_street_name, cross_street_name
 
 Now, some questions!
+
+# INTEGRITY CHECKS
+```{r}
+#check first and last date: 
+data %>% summarise(date_range = range(crash_date))
+
+range(data$crash_date)
+
+```
+
+```{r}
+# what times do accidents happen the most?
+
+data %>% count(crash_time) %>%
+  arrange(desc(n))
+```
+
+```{r}
+data %>% count(zip_code) %>%
+  arrange(desc(n))
+```
+
+```{r}
+data %>% filter(is.na(latitude) | latitude=="" | is.na(longitude) | longitude=="")
+
+9256/296027 # 3%
+```
+
+```{r}
+data %>% filter(is.na(latitude) | latitude=="" | is.na(longitude) | longitude=="") %>%
+  count(year(crash_date)) %>%
+  arrange(desc(n))
+```
+
