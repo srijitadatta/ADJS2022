@@ -5,7 +5,7 @@ html_notebook: default
 ---
 
 
-```{r loading, message=FALSE, warning=FALSE}
+```{r}
 library(tidyverse)
 library(tidycensus)
 ```
