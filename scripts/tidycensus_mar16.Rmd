@@ -1,0 +1,41 @@
+---
+title: "Tidycensus - March 16"
+output: 
+html_notebook: default
+---
+
+
+```{r loading, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidycensus)
+```
+
+Here's the documentation for [tidycensus](https://walker-data.com/tidycensus/articles/basic-usage.html#geography-in-tidycensus-1)
+
+Start with a very basic request: population by county
+```{r}
+county_pop <- get_acs(geography = "county", 
+              variables = "B01001_001", 
+              state = "MO", 
+              year = 2019)
+
+county_pop_acs1 <- get_acs(geography = "county", 
+              variables = "B01001_001", 
+              state = "MO", 
+              year = 2019,
+              survey = "acs1")
+```
+
+Now by place (and you can rename the variable): 
+```{r}
+place_pop <- get_acs(geography = "place", 
+              variables = c(population="B01001_001"), 
+              state = "MO", 
+              year = 2019)
+```
+
+Search for variables:
+```{r}
+acs2019_var <- load_variables(2019, "acs5", cache=TRUE)
+
+```
