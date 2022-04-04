@@ -1,0 +1,78 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+```
+
+Downloaded from https://github.com/utdata/rwd-billboard-data on April 4, 2022.
+Billboard Hot 100 data - top 100 songs every week. 
+
+```{r}
+billboard <- read_csv("data/hot100_kaggle_195808_20211106.txt")
+
+billboard <- billboard %>% clean_names()
+```
+
+
+Rows: 330,087
+What is one row: one song x one week
+Date range? 8/4/1858 to 11/6/2021
+```{r}
+billboard %>% count(date) %>% arrange(desc(date))
+
+billboard %>% summarise(range(date))
+```
+
+```{r}
+billboard %>% filter(song=="Bohemian Rhapsody" & artist=="Queen")
+```
+
+```{r}
+billboard %>% filter(song=="Yesterday" & grepl("Beatles", artist)) %>% arrange(peak_rank)
+
+billboard %>% filter(song=="Yesterday" & grepl("Beatles", artist)) %>% summarise(min_rank = min(peak_rank))
+```
+
+
+Which song spent the longest time on Billboard Top 100?
+Blinding Lights by The Weeknd
+```{r}
+billboard %>% arrange(desc(weeks_on_board))
+
+billboard %>% group_by(artist,song) %>% 
+  summarise(max_weeks = max(weeks_on_board)) %>% 
+  arrange(desc(max_weeks))
+```
+
+Which artist has the most songs that hit the Top 100? 
+Glee Cast with 183 songs. 
+What are they?
+```{r}
+billboard %>% group_by(artist) %>% 
+  summarise(num_songs = n_distinct(song)) %>%
+  arrange(desc(num_songs))
+
+billboard %>% filter(artist=="Glee Cast") %>%
+  group_by(song) %>%
+  summarise(rank = min(peak_rank)) %>%
+  arrange(rank)
+```
+
+Which artist has the most cumulative weeks (regardless of song)? 
+Taylor Swift
+```{r}
+billboard %>% count(artist) %>% arrange(desc(n))
+```
+
+How many songs has Beyonce had on the Top 100? 
+```{r}
+billboard %>% filter(grepl("Beyonce", artist) & !grepl("Featuring Beyonce", artist) & peak_rank==1) %>%
+  distinct(song)
+```
+
+
+

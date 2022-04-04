@@ -43,6 +43,9 @@ acs2019_var <- load_variables(2019, "acs5", cache=TRUE)
 income_var <- acs2019_var %>% filter(grepl("Income in the past 12 months", label))
 plumbing_var <- acs2019_var %>% filter(grepl("Plumbing", label))
 
+# Use data.census.gov to find the Table ID for the table that has the data you want, and use that Table ID in a search of all variables: 
+acs2019_var %>% filter(grepl("B25049", name))
+
 ```
 
 Also, you can use data.census.gov to locate the variables you're interested in.
