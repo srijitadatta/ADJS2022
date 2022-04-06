@@ -15,6 +15,7 @@ Inside tidyverse is a package known as "rvest". You can read the documentation h
 
 ```{r}
 library(tidyverse)
+library(rvest)
 library(janitor)
 ```
 
@@ -25,7 +26,7 @@ Web scraping should be used to reduce human labor. So if you're planning to grab
 
 ### URL of the website to be scraped:   
 ```{r}
-
+url <- "https://www.como.gov/CMS/911dispatch/police.php"
 ```
 
 ### Steps to get and parse the html  
@@ -35,6 +36,49 @@ The html_element() function finds a particular element, or "tag" inside the html
 The html_table() function takes the HMTL inside of the <table> tag and turns it into a tibble (a tidyverse data frame)... aka something we can analyze!
 
 ```{r}
+html <- read_html(url)
+
+table1 <- html %>% html_element("table") %>%
+  html_table() %>%
+  clean_names() %>%
+  filter(grepl("4/6/2022", date_time))
+
+```
+
+
+Second scrape for one week of data: 
+```{r}
+url2 <- "https://www.como.gov/CMS/911dispatch/police.php?type=&keyword=&Start_Date=2022-03-30&End_Date=2022-04-05&Submit=Filter"
+
+url3 <- "https://www.como.gov/CMS/911dispatch/police.php?type=&keyword=&Start_Date=2022-03-30&End_Date=2022-04-05&Submit=Filter&offset=100"
+
+html2 <- read_html(url2)
+html3 <- read_html(url3)
+
+html2 %>% html_element("table") %>%
+  html_table()
+
+html3 %>% html_element("table") %>%
+  html_table()
+```
+
+
+```{r}
+url4 <- "https://www.como.gov/CMS/911dispatch/police.php?type=&keyword=&Start_Date=2022-03-30&End_Date=2022-04-05&Submit=Filter&offset="
+
+offsets = c("0", "100", "200", "300", "400", "500", "600", "700", "800", "900", "1000", "1100", "1200", "1300", "1400", "1500")
+
+offsets2 = seq(from=0, to=1500, by=100)
+
+master_data = NULL
+
+for (x in offsets){
+  url_temp <- paste0(url4, x)
+  html4 <- read_html(url_temp)
+  data4 <- html4 %>% html_element("table") %>% html_table() %>% clean_names
+  master_data <- rbind(master_data, data4)
+}
+
 
 ```
 
