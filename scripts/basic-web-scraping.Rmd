@@ -1,0 +1,40 @@
+---
+title: "basic web scraping"
+output: html_notebook
+---
+
+### OVERVIEW
+
+Web scraping is literally "scraping" information off of a webpage and into a program (we're using R obviously) so that you can reformat it into something that is analyzable.   
+Web scraping can be pretty easy or very complicated, and it all depends on how the webpage was built that you are trying to scrape. As in introduction to scraping we'll be doing a very easy scrape, one that only pulls information from the HTML on a webpage. 
+(This assumes you have some basic knowledge of HTML and the various "tags" that it uses).   
+I recommend that you use **Firefox** or **Chrome** for this, as they both have a tool called "Inspect" that is useful for viewing HTML on any webpage.
+
+First, load the necessary libraries: tidyverse. 
+Inside tidyverse is a package known as "rvest". You can read the documentation here: [rvest.tidyverse.org](https://rvest.tidyverse.org/)  
+
+```{r}
+library(tidyverse)
+library(janitor)
+```
+
+For this exercise, we're going to scrape the police dispatch records from the Columbia website: 
+[https://www.como.gov/CMS/911dispatch/police.php](https://www.como.gov/CMS/911dispatch/police.php)  
+Note that this website has an "Export CSV" option. If you just want a snapshot of this data, use the search options and download the CSV! That's much easier.   
+Web scraping should be used to reduce human labor. So if you're planning to grab data from this website every day for a month, then a scraper makes more sense.  
+
+### URL of the website to be scraped:   
+```{r}
+
+```
+
+### Steps to get and parse the html  
+rvest does all the hard work here.  
+The read_html() function reads the webpage and returns the html. It gets stored in R as a series of embedded lists.  
+The html_element() function finds a particular element, or "tag" inside the html. Our table is coded into the page using a <table> tag (which you'll see if you right-click on the table from the browser and choose "Inspect" - this will show you the HTML for that section).  
+The html_table() function takes the HMTL inside of the <table> tag and turns it into a tibble (a tidyverse data frame)... aka something we can analyze!
+
+```{r}
+
+```
+
