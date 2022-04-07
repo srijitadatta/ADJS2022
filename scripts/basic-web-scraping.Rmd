@@ -35,6 +35,8 @@ The read_html() function reads the webpage and returns the html. It gets stored 
 The html_element() function finds a particular element, or "tag" inside the html. Our table is coded into the page using a <table> tag (which you'll see if you right-click on the table from the browser and choose "Inspect" - this will show you the HTML for that section).  
 The html_table() function takes the HMTL inside of the <table> tag and turns it into a tibble (a tidyverse data frame)... aka something we can analyze!
 
+Note: for this particular webpage, the returned results contain two rows of metadata that we don't want: a summary of how many records were returned, and a list of pages (if the main page is paginated) at the bottom. We remove both of those with the filter.
+
 ```{r}
 html <- read_html(url)
 
@@ -46,36 +48,74 @@ table1 <- html %>% html_element("table") %>%
 ```
 
 
+That was pretty easy. Now we'll get fancier: use the search box at the top of the page to get results for a full week: 3/30/2022 to 4/05/2022 (Wednesday through Tuesday). Hit Submit. Now we get 1582 records. And notice what happened to the URL: it reflects the parameters that we entered into the search box. Let's break it down:  
+  
+* https://www.como.gov/CMS/911dispatch/police.php
+* ?
+* type=
+* &keyword=
+* &Start_Date=03%2F30%2F2022
+* &End_Date=04%2F05%2F202
+* &Submit=Filter
+
+First is the base of our original URL. That is followed by a question mark, which indicates that parameters are about to be passed.  
+The first parameter is "type", which you can see in the search options box. We didn't use it, so that parameter is blank.  
+Same for "keyword" (which links to the "Street Name or Address" box.)  
+But we have a Start_Date and an End_Date. URLs can't have certain characters (like slashes) as part of the parameters, so they are encoded. The slash in the data here is represented as "%2F". See a table of those alternate characters here: [URL Encoding Reference](https://www.w3schools.com/tags/ref_urlencode.ASP)  
+The final parameter is to Submit the Filter options. 
+
+This is good to know. That means we can mess with the filters without ever having to visit the webpage. 
+
 Second scrape for one week of data: 
 ```{r}
 url2 <- "https://www.como.gov/CMS/911dispatch/police.php?type=&keyword=&Start_Date=2022-03-30&End_Date=2022-04-05&Submit=Filter"
 
-url3 <- "https://www.como.gov/CMS/911dispatch/police.php?type=&keyword=&Start_Date=2022-03-30&End_Date=2022-04-05&Submit=Filter&offset=100"
-
 html2 <- read_html(url2)
-html3 <- read_html(url3)
 
 html2 %>% html_element("table") %>%
   html_table()
+```
+
+Notice anything about the results you get back? 
+
+There should be 1500+ records, but instead we only have 100. If you go back to the actual webpage to find out why, you'll see that it paginates the results. It shows the first 100, but then you have to click on the following pages to see the rest. The scraper only scraped what was on the first page. Click on the "2" to go to the second page and look at the URL: it wiped away our filter options, but added another parameter: "offset=100".
+
+We can test the offset to see if it works with the url filters: 
+```{r}
+url3 <- "https://www.como.gov/CMS/911dispatch/police.php?type=&keyword=&Start_Date=2022-03-30&End_Date=2022-04-05&Submit=Filter&offset=100"
+
+html3 <- read_html(url3)
 
 html3 %>% html_element("table") %>%
   html_table()
 ```
 
 
+If we compare those results to the second page, we can see that they are the same.  Now we *could* scrape each individual page (sixteen of them) and combine the results, or we could write a **LOOP** to loop through each page automatically. 
+
+Create a loop to deal with the offsets
 ```{r}
+# this is our base url. It is all the static parts of the url; the only thing that will change is the offset number, which we've excluded
 url4 <- "https://www.como.gov/CMS/911dispatch/police.php?type=&keyword=&Start_Date=2022-03-30&End_Date=2022-04-05&Submit=Filter&offset="
 
+# this is a vector of the different offset values we need to use to scrape each of the sixteen pages.
 offsets = c("0", "100", "200", "300", "400", "500", "600", "700", "800", "900", "1000", "1100", "1200", "1300", "1400", "1500")
 
+# this is a second way we could create the vector (using numbers rather than text, which shouldn't make a difference)
 offsets2 = seq(from=0, to=1500, by=100)
 
+# this is a container for our final data. It has to exist OUTSIDE of the for loop... what happens in a loop stays in a loop unless you pass it oustide of the loop. This is a fundamental rule in programming. 
 master_data = NULL
 
+# the (x in offsets) part of this loop means: For each value (x) in the vector "`offsets` (which we created above). So for each iteration of the loop, x = one of the offset values, starting with "0". 
 for (x in offsets){
+# use the paste0() function here to string items together. Here, were pasting the various offset values (represented as "x") to the base URL:
   url_temp <- paste0(url4, x)
+# now we just follow the steps we used for previous individual pages:
   html4 <- read_html(url_temp)
   data4 <- html4 %>% html_element("table") %>% html_table() %>% clean_names
+# and at the end of each iteration of the loop, we want to add that page's data to the container for our final data. 
+# the rbind function means "bind rows" and it glues together rows that have the same structure
   master_data <- rbind(master_data, data4)
 }
 
