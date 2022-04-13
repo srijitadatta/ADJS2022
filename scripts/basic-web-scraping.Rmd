@@ -54,14 +54,14 @@ That was pretty easy. Now we'll get fancier: use the search box at the top of th
 * ?
 * type=
 * &keyword=
-* &Start_Date=03%2F30%2F2022
-* &End_Date=04%2F05%2F202
+* &Start_Date=2022-03-30
+* &End_Date=2022-04-05
 * &Submit=Filter
 
 First is the base of our original URL. That is followed by a question mark, which indicates that parameters are about to be passed.  
 The first parameter is "type", which you can see in the search options box. We didn't use it, so that parameter is blank.  
 Same for "keyword" (which links to the "Street Name or Address" box.)  
-But we have a Start_Date and an End_Date. URLs can't have certain characters (like slashes) as part of the parameters, so they are encoded. The slash in the data here is represented as "%2F". See a table of those alternate characters here: [URL Encoding Reference](https://www.w3schools.com/tags/ref_urlencode.ASP)  
+But we have a Start_Date and an End_Date. 
 The final parameter is to Submit the Filter options. 
 
 This is good to know. That means we can mess with the filters without ever having to visit the webpage. 
