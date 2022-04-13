@@ -1,0 +1,26 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(rvest)
+```
+
+```{r}
+url <- "https://www.billboard.com/charts/hot-100/"
+
+html <- read_html(url)
+
+nodes <- html %>% html_nodes("div.o-chart-results-list-row-container")
+```
+
+```{r}
+nodes %>% 
+  html_nodes("li.lrv-u-width-100p") %>% 
+  html_nodes("h3") %>% 
+  html_text2()
+```
+
+
