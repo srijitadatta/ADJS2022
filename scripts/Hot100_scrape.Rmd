@@ -17,10 +17,40 @@ nodes <- html %>% html_nodes("div.o-chart-results-list-row-container")
 ```
 
 ```{r}
-nodes %>% 
+songs <- nodes %>% 
   html_nodes("li.lrv-u-width-100p") %>% 
   html_nodes("h3") %>% 
+  html_text2() %>%
+  tibble()
+```
+
+```{r}
+everything <- nodes %>% 
+  html_nodes("li.lrv-u-width-100p") %>%
+  html_nodes("span") %>%
   html_text2()
 ```
 
+```{r}
+artists <- everything[seq(from=1, to=700, by=7)] %>% tibble()
+last_week <- everything[seq(from=2, to=700, by=7)] %>% tibble()
+peak <- everything[seq(from=3, to=700, by=7)] %>% tibble()
+weeks <- everything[seq(from=4, to=700, by=7)] %>% tibble()
+ranks <- c(1:100) %>% tibble()
+
+data <- cbind(ranks, artists, songs, last_week, peak, weeks) %>%
+  rename("rank"=1, "artist"=2, "song"=3, "last_week"=4, "peak_rank"=5, "weeks_on_board"=6)
+```
+
+Han's scrape:
+```{r}
+data2 <- nodes %>% 
+  html_nodes("ul.lrv-a-unstyle-list") %>% 
+  html_text2() %>%
+  str_replace_all("\n", ",")
+
+data2 <- data2[seq(from=1, to=300, by=3)] %>% tibble()
+
+
+```
 
