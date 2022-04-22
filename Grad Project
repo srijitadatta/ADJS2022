@@ -1,0 +1,23 @@
+library(tidyverse)
+library(rvest)
+library(readxl)
+library(janitor)
+```
+
+```{r}
+getwd()
+df1 <- read_excel("/Users/srijitadatta/Documents/0700-Report-Boone-County.xlsx")
+df2 <- read_excel("/Users/srijitadatta/Documents/Current-Detainees-of-Boone-County-Jail.xlsx")
+```
+
+```{r}
+names(df1) [12] <- 'case number'
+names(df2) [10] <- 'case number'
+```
+
+```{r}
+Data <- df1 %>%
+  inner_join(df2, by="case number")
+```
+
+
