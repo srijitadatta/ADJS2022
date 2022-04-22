@@ -20,4 +20,13 @@ Data <- df1 %>%
   inner_join(df2, by="case number")
 ```
 
+Data <- Data %>% 
+ clean_names()
+```
+
+
+```{r}
+Data %>% 
+  summarise(date_range = range(booking_date))
+```
 
